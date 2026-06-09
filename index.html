@@ -242,21 +242,6 @@
     animation: fadeUp 1s ease 1.1s both;
   }
 
-  .scroll-hint {
-    position: absolute; bottom: 32px; left: 50%;
-    transform: translateX(-50%);
-    display: flex; flex-direction: column; align-items: center;
-    gap: 8px;
-    animation: fadeUp 1s ease 1.5s both;
-    color: var(--text-light);
-    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
-  }
-  .scroll-arrow {
-    width: 1px; height: 40px;
-    background: var(--gold-light);
-    position: relative;
-    animation: scrollPulse 2s ease-in-out infinite;
-  }
   @keyframes scrollPulse {
     0%, 100% { transform: scaleY(1); opacity: 0.5; }
     50% { transform: scaleY(1.2); opacity: 1; }
@@ -719,11 +704,6 @@
       </div>
       <p class="hero-date">Saturday, the 14th of February · 2026</p>
       <p class="hero-sub">request the honour of your presence</p>
-    </div>
-
-    <div class="scroll-hint">
-      <span>Scroll</span>
-      <div class="scroll-arrow"></div>
     </div>
   </section>
 
