@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amara & Julian — Wedding Invitation</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400&family=Great+Vibes&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --blush: #f5e6e0;
+    --rose: #d4896a;
+    --rose-dark: #a05e45;
+    --sage: #8a9e8c;
+    --sage-light: #c8d8c9;
+    --cream: #faf6f0;
+    --gold: #c9a96e;
+    --gold-light: #e8d5b0;
+    --text-dark: #2c2420;
+    --text-mid: #6b534a;
+    --text-light: #a08070;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: var(--cream);
+    color: var(--text-dark);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* ─── ENVELOPE INTRO ─── */
+  #envelope-screen {
+    position: fixed; inset: 0;
+    background: #2c2420;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 100;
+    cursor: pointer;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+  }
+  #envelope-screen.hidden { opacity: 0; visibility: hidden; }
+
+  .envelope-wrap {
+    position: relative;
+    width: min(340px, 85vw);
+    animation: floatEnv 3s ease-in-out infinite;
+  }
+  @keyframes floatEnv {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-12px); }
+  }
+  .envelope-wrap.opening { animation: openEnv 0.9s ease forwards; }
+  @keyframes openEnv {
+    0% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-20px) scale(1.05); }
+    100% { transform: translateY(-200px) scale(0.8); opacity: 0; }
+  }
+
+  .env-body {
+    width: 100%;
+    padding-bottom: 65%;
+    background: #f0e8dc;
+    border-radius: 4px 4px 12px 12px;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  .env-flap {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 60%;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    background: #e8ddd0;
+    transform-origin: top center;
+    transition: transform 0.6s ease;
+    z-index: 2;
+  }
+  .envelope-wrap.opening .env-flap {
+    transform: rotateX(180deg);
+  }
+  .env-bottom-fold {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 52%;
+    clip-path: polygon(0 100%, 100% 100%, 50% 0%);
+    background: #ddd0c2;
+  }
+  .env-left-fold {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 52%;
+    clip-path: polygon(0 0, 0 100%, 100% 50%);
+    background: #e3d8cb;
+  }
+  .env-right-fold {
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 52%;
+    clip-path: polygon(100% 0, 100% 100%, 0 50%);
+    background: #e3d8cb;
+  }
+  .env-seal {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 52px; height: 52px;
+    background: var(--rose);
+    border-radius: 50%;
+    z-index: 3;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Great Vibes', cursive;
+    color: white;
+    font-size: 22px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  }
+  .env-tap-hint {
+    margin-top: 28px;
+    color: rgba(255,255,255,0.55);
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+  .env-stars {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .star {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 50%;
+    animation: twinkle var(--d) ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.8); }
+  }
+
+  /* ─── MAIN INVITATION ─── */
+  #main {
+    opacity: 0;
+    transition: opacity 1.2s ease;
+  }
+  #main.visible { opacity: 1; }
+
+  /* Decorative top border */
+  .gold-border-top {
+    height: 6px;
+    background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100svh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 60px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, #f5e6e0 0%, transparent 70%),
+      radial-gradient(ellipse 60% 40% at 20% 80%, #c8d8c9 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 80% 70%, #e8d5b0 0%, transparent 60%),
+      var(--cream);
+  }
+
+  /* Floating petals */
+  .petal {
+    position: absolute;
+    width: 18px; height: 24px;
+    border-radius: 50% 10% 50% 10%;
+    opacity: 0.35;
+    animation: floatPetal var(--dur) linear infinite;
+    animation-delay: var(--delay);
+  }
+  @keyframes floatPetal {
+    0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.4; }
+    90% { opacity: 0.3; }
+    100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; }
+  }
+
+  .hero-content { position: relative; z-index: 1; }
+
+  .hero-pre {
+    font-size: 11px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 20px;
+    animation: fadeUp 1s ease 0.3s both;
+  }
+  .hero-names {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(64px, 14vw, 110px);
+    color: var(--rose-dark);
+    line-height: 1.1;
+    animation: fadeUp 1s ease 0.5s both;
+  }
+  .hero-ampersand {
+    display: block;
+    font-size: clamp(44px, 10vw, 78px);
+    color: var(--gold);
+    line-height: 0.9;
+  }
+  .hero-divider {
+    display: flex; align-items: center; gap: 16px;
+    margin: 28px auto;
+    width: min(280px, 80%);
+    animation: fadeUp 1s ease 0.7s both;
+  }
+  .hero-divider-line { flex: 1; height: 1px; background: var(--gold-light); }
+  .hero-divider-icon { color: var(--gold); font-size: 18px; }
+  .hero-date {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(17px, 4vw, 22px);
+    letter-spacing: 4px;
+    color: var(--text-mid);
+    font-weight: 300;
+    animation: fadeUp 1s ease 0.9s both;
+  }
+  .hero-sub {
+    margin-top: 8px;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    animation: fadeUp 1s ease 1.1s both;
+  }
+
+  .scroll-hint {
+    position: absolute; bottom: 32px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center;
+    gap: 8px;
+    animation: fadeUp 1s ease 1.5s both;
+    color: var(--text-light);
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+  }
+  .scroll-arrow {
+    width: 1px; height: 40px;
+    background: var(--gold-light);
+    position: relative;
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollPulse {
+    0%, 100% { transform: scaleY(1); opacity: 0.5; }
+    50% { transform: scaleY(1.2); opacity: 1; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── SECTION COMMON ─── */
+  section { padding: 80px 24px; }
+
+  .section-label {
+    text-align: center;
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(36px, 8vw, 54px);
+    color: var(--rose-dark);
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .gold-ornament {
+    display: flex; align-items: center; gap: 12px;
+    justify-content: center;
+    margin-bottom: 40px;
+  }
+  .orn-line { width: 60px; height: 1px; background: var(--gold-light); }
+  .orn-diamond {
+    width: 7px; height: 7px;
+    background: var(--gold);
+    transform: rotate(45deg);
+  }
+
+  /* ─── DETAILS CARDS ─── */
+  .details-section {
+    background: white;
+    position: relative;
+    overflow: hidden;
+  }
+  .details-section::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, transparent, var(--sage-light), var(--sage), var(--sage-light), transparent);
+  }
+
+  .details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 32px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .detail-card {
+    text-align: center;
+    padding: 32px 20px;
+    background: var(--cream);
+    border: 1px solid var(--gold-light);
+    border-radius: 12px;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .detail-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(196, 154, 110, 0.15);
+  }
+  .detail-card-icon {
+    font-size: 28px;
+    margin-bottom: 16px;
+    display: block;
+    color: var(--rose);
+  }
+  .detail-card-label {
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 10px;
+  }
+  .detail-card-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    color: var(--text-dark);
+    font-weight: 400;
+    line-height: 1.5;
+  }
+  .detail-card-sub {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 6px;
+  }
+
+  /* ─── STORY / PHOTO SECTION ─── */
+  .story-section {
+    background: var(--blush);
+    text-align: center;
+  }
+  .photo-frame {
+    width: min(260px, 70vw);
+    aspect-ratio: 3/4;
+    margin: 0 auto 36px;
+    border-radius: 120px 120px 12px 12px;
+    background: linear-gradient(145deg, var(--sage-light) 0%, var(--blush) 60%, var(--gold-light) 100%);
+    position: relative;
+    overflow: hidden;
+    border: 3px solid white;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.1);
+  }
+  .photo-placeholder {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 10px;
+    color: var(--text-light);
+  }
+  .photo-placeholder svg { opacity: 0.4; }
+  .photo-placeholder span { font-size: 12px; letter-spacing: 2px; }
+
+  .story-quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(18px, 4vw, 24px);
+    color: var(--text-mid);
+    max-width: 520px;
+    margin: 0 auto 24px;
+    line-height: 1.8;
+  }
+  .story-body {
+    font-size: 15px;
+    color: var(--text-light);
+    max-width: 440px;
+    margin: 0 auto;
+    line-height: 1.9;
+  }
+
+  /* ─── PROGRAMME ─── */
+  .programme-section { background: var(--cream); }
+
+  .timeline {
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 50%; top: 0; bottom: 0;
+    width: 1px;
+    background: var(--gold-light);
+    transform: translateX(-50%);
+  }
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 1fr 40px 1fr;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 36px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .timeline-item.visible { opacity: 1; transform: none; }
+  .timeline-item:nth-child(odd) .tl-content { text-align: right; grid-column: 1; }
+  .timeline-item:nth-child(odd) .tl-time { grid-column: 3; text-align: left; }
+  .timeline-item:nth-child(even) .tl-content { grid-column: 3; text-align: left; }
+  .timeline-item:nth-child(even) .tl-time { grid-column: 1; text-align: right; }
+
+  .tl-dot {
+    grid-column: 2;
+    width: 14px; height: 14px;
+    background: var(--rose);
+    border: 3px solid white;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--rose);
+    justify-self: center;
+    z-index: 1;
+  }
+  .tl-event {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    color: var(--text-dark);
+    font-weight: 600;
+  }
+  .tl-desc {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 3px;
+  }
+  .tl-time {
+    font-size: 13px;
+    color: var(--gold);
+    letter-spacing: 1px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+  }
+
+  /* ─── VENUE MAP ─── */
+  .venue-section {
+    background: #2c2420;
+    color: white;
+    text-align: center;
+  }
+  .venue-section .section-title { color: var(--gold-light); }
+  .venue-section .section-label { color: rgba(255,255,255,0.4); }
+
+  .venue-card {
+    max-width: 480px;
+    margin: 0 auto;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(201,169,110,0.3);
+    border-radius: 16px;
+    padding: 36px 28px;
+  }
+  .venue-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    color: var(--gold-light);
+    margin-bottom: 8px;
+  }
+  .venue-address {
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.8;
+    margin-bottom: 28px;
+  }
+  .map-preview {
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    height: 180px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  /* Simple illustrated map */
+  .map-inner { width: 100%; height: 100%; position: relative; }
+
+  .map-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 28px;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    border-radius: 100px;
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.3s, color 0.3s;
+    cursor: pointer;
+  }
+  .map-btn:hover { background: var(--gold); color: #2c2420; }
+
+  /* ─── RSVP ─── */
+  .rsvp-section { background: var(--blush); text-align: center; }
+
+  .rsvp-card {
+    max-width: 460px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    padding: 44px 32px;
+    box-shadow: 0 4px 60px rgba(196,120,100,0.12);
+    border: 1px solid var(--gold-light);
+  }
+  .rsvp-note {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--text-mid);
+    margin-bottom: 32px;
+    line-height: 1.7;
+  }
+  .rsvp-deadline {
+    display: inline-block;
+    padding: 6px 16px;
+    background: var(--blush);
+    border-radius: 100px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--rose-dark);
+    margin-bottom: 32px;
+  }
+  .rsvp-btns { display: flex; flex-direction: column; gap: 14px; }
+  .rsvp-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 16px 24px;
+    border-radius: 12px;
+    font-family: 'Jost', sans-serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: none;
+  }
+  .rsvp-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+  .rsvp-wa {
+    background: #25d366;
+    color: white;
+  }
+  .rsvp-form {
+    background: var(--rose);
+    color: white;
+  }
+
+  /* ─── COUNTDOWN ─── */
+  .countdown-section { background: white; text-align: center; }
+  .countdown-grid {
+    display: flex; justify-content: center; gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .count-box {
+    background: var(--cream);
+    border: 1px solid var(--gold-light);
+    border-radius: 12px;
+    padding: 20px 16px;
+    min-width: 72px;
+  }
+  .count-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px;
+    font-weight: 300;
+    color: var(--rose-dark);
+    line-height: 1;
+    display: block;
+  }
+  .count-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-top: 6px;
+    display: block;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: #2c2420;
+    color: rgba(255,255,255,0.4);
+    text-align: center;
+    padding: 44px 24px;
+  }
+  .footer-names {
+    font-family: 'Great Vibes', cursive;
+    font-size: 40px;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+  footer p { font-size: 12px; letter-spacing: 2px; line-height: 2; }
+
+  /* ─── MUSIC TOGGLE ─── */
+  .music-btn {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    width: 48px; height: 48px;
+    background: var(--rose);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    z-index: 50;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.2s;
+    opacity: 0;
+    visibility: hidden;
+  }
+  .music-btn.show { opacity: 1; visibility: visible; }
+  .music-btn:hover { transform: scale(1.1); }
+  .music-note { animation: spin 3s linear infinite; display: inline-block; }
+  .music-note.paused { animation-play-state: paused; }
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* ─── SCROLL REVEAL ─── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ─── MOBILE ─── */
+  @media (max-width: 480px) {
+    .timeline::before { left: 20px; transform: none; }
+    .timeline-item { grid-template-columns: 40px 1fr; }
+    .timeline-item:nth-child(odd) .tl-content,
+    .timeline-item:nth-child(even) .tl-content { grid-column: 2; text-align: left; }
+    .timeline-item:nth-child(odd) .tl-time,
+    .timeline-item:nth-child(even) .tl-time { grid-column: 2; text-align: left; order: -1; }
+    .tl-dot { grid-column: 1; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ ENVELOPE INTRO ═══ -->
+<div id="envelope-screen" onclick="openEnvelope()">
+  <div class="env-stars" id="stars"></div>
+  <div class="envelope-wrap" id="env">
+    <div class="env-body">
+      <div class="env-flap" id="flap"></div>
+      <div class="env-bottom-fold"></div>
+      <div class="env-left-fold"></div>
+      <div class="env-right-fold"></div>
+      <div class="env-seal">A&J</div>
+    </div>
+  </div>
+  <p class="env-tap-hint">tap to open</p>
+</div>
+
+<!-- ═══ MUSIC ═══ -->
+<button class="music-btn" id="musicBtn" onclick="toggleMusic()" aria-label="Toggle music">
+  <span class="music-note" id="musicNote">♪</span>
+</button>
+
+<!-- ═══ MAIN INVITATION ═══ -->
+<div id="main">
+  <div class="gold-border-top"></div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <!-- Petals -->
+    <div class="petal" style="background:var(--rose);left:5%;--dur:12s;--delay:0s"></div>
+    <div class="petal" style="background:var(--sage-light);left:15%;--dur:15s;--delay:2s"></div>
+    <div class="petal" style="background:var(--gold-light);left:30%;--dur:10s;--delay:4s"></div>
+    <div class="petal" style="background:var(--blush);left:60%;--dur:13s;--delay:1s"></div>
+    <div class="petal" style="background:var(--rose);left:75%;--dur:11s;--delay:3s"></div>
+    <div class="petal" style="background:var(--sage-light);left:88%;--dur:14s;--delay:5s"></div>
+    <div class="petal" style="background:var(--gold-light);left:45%;--dur:16s;--delay:7s"></div>
+
+    <div class="hero-content">
+      <p class="hero-pre">Together with their families</p>
+      <h1 class="hero-names">
+        Amara
+        <span class="hero-ampersand">&</span>
+        Julian
+      </h1>
+      <div class="hero-divider">
+        <span class="hero-divider-line"></span>
+        <span class="hero-divider-icon">✦</span>
+        <span class="hero-divider-line"></span>
+      </div>
+      <p class="hero-date">Saturday, the 14th of February · 2026</p>
+      <p class="hero-sub">request the honour of your presence</p>
+    </div>
+
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </section>
+
+  <!-- DETAILS -->
+  <section class="details-section reveal">
+    <p class="section-label">The Details</p>
+    <h2 class="section-title">Save the Date</h2>
+    <div class="gold-ornament"><div class="orn-line"></div><div class="orn-diamond"></div><div class="orn-line"></div></div>
+    <div class="details-grid">
+      <div class="detail-card">
+        <span class="detail-card-icon">🕊️</span>
+        <p class="detail-card-label">Ceremony</p>
+        <p class="detail-card-value">4:00 PM</p>
+        <p class="detail-card-sub">Doors open at 3:30 PM</p>
+      </div>
+      <div class="detail-card">
+        <span class="detail-card-icon">🌹</span>
+        <p class="detail-card-label">Reception</p>
+        <p class="detail-card-value">6:30 PM</p>
+        <p class="detail-card-sub">Dinner & Dancing</p>
+      </div>
+      <div class="detail-card">
+        <span class="detail-card-icon">🎀</span>
+        <p class="detail-card-label">Dress Code</p>
+        <p class="detail-card-value">Garden Formal</p>
+        <p class="detail-card-sub">Pastels & Florals Welcome</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COUNTDOWN -->
+  <section class="countdown-section reveal">
+    <p class="section-label">Counting Down</p>
+    <h2 class="section-title">Until We Say I Do</h2>
+    <div class="gold-ornament"><div class="orn-line"></div><div class="orn-diamond"></div><div class="orn-line"></div></div>
+    <div class="countdown-grid">
+      <div class="count-box"><span class="count-num" id="cd-days">--</span><span class="count-label">Days</span></div>
+      <div class="count-box"><span class="count-num" id="cd-hours">--</span><span class="count-label">Hours</span></div>
+      <div class="count-box"><span class="count-num" id="cd-mins">--</span><span class="count-label">Minutes</span></div>
+      <div class="count-box"><span class="count-num" id="cd-secs">--</span><span class="count-label">Seconds</span></div>
+    </div>
+  </section>
+
+  <!-- STORY -->
+  <section class="story-section reveal">
+    <p class="section-label">Our Story</p>
+    <h2 class="section-title">How It Began</h2>
+    <div class="gold-ornament"><div class="orn-line"></div><div class="orn-diamond"></div><div class="orn-line"></div></div>
+    <div class="photo-frame">
+      <div class="photo-placeholder">
+        <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+          <circle cx="12" cy="8" r="3"/><path d="M6 20v-1a6 6 0 0112 0v1"/>
+          <circle cx="18" cy="8" r="3"/><path d="M20 20v-1a5 5 0 00-3-4.6"/>
+        </svg>
+        <span>Couple Photo</span>
+      </div>
+    </div>
+    <p class="story-quote">"Two souls, one heart — a love written in the stars."</p>
+    <p class="story-body">What started as a chance encounter at a garden café in the spring of 2022 blossomed into the most beautiful chapter of our lives. We can't wait to share this magical day with everyone we love.</p>
+  </section>
+
+  <!-- PROGRAMME -->
+  <section class="programme-section reveal">
+    <p class="section-label">Programme</p>
+    <h2 class="section-title">The Day</h2>
+    <div class="gold-ornament"><div class="orn-line"></div><div class="orn-diamond"></div><div class="orn-line"></div></div>
+    <div class="timeline" id="timeline">
+      <div class="timeline-item">
+        <div class="tl-content"><div class="tl-event">Guest Arrival</div><div class="tl-desc">Welcome drinks & florals</div></div>
+        <div class="tl-dot"></div>
+        <div class="tl-time">3:30 PM</div>
+      </div>
+      <div class="timeline-item">
+        <div class="tl-content"><div class="tl-event">Ceremony</div><div class="tl-desc">Exchange of vows</div></div>
+        <div class="tl-dot"></div>
+        <div class="tl-time">4:00 PM</div>
+      </div>
+      <div class="timeline-item">
+        <div class="tl-content"><div class="tl-event">Garden Cocktails</div><div class="tl-desc">Canapes & sunset photos</div></div>
+        <div class="tl-dot"></div>
+        <div class="tl-time">5:00 PM</div>
+      </div>
+      <div class="timeline-item">
+        <div class="tl-content"><div class="tl-event">Grand Reception</div><div class="tl-desc">Dinner, speeches & first dance</div></div>
+        <div class="tl-dot"></div>
+        <div class="tl-time">6:30 PM</div>
+      </div>
+      <div class="timeline-item">
+        <div class="tl-content"><div class="tl-event">Dancing & Cake</div><div class="tl-desc">Celebrate until midnight</div></div>
+        <div class="tl-dot"></div>
+        <div class="tl-time">8:30 PM</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VENUE -->
+  <section class="venue-section reveal">
+    <p class="section-label">Where</p>
+    <h2 class="section-title" style="color:var(--gold-light)">The Venue</h2>
+    <div class="gold-ornament"><div class="orn-line" style="background:rgba(201,169,110,0.3)"></div><div class="orn-diamond"></div><div class="orn-line" style="background:rgba(201,169,110,0.3)"></div></div>
+    <div class="venue-card">
+      <p class="venue-name">Rosewood Garden Estate</p>
+      <p class="venue-address">42 Blossom Lane, Willow Valley<br>Colombo, Sri Lanka 10100</p>
+      <div class="map-preview">
+        <svg width="100%" height="100%" viewBox="0 0 400 180" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="180" fill="#2e2a26"/>
+          <!-- Roads -->
+          <line x1="0" y1="90" x2="400" y2="90" stroke="#3d3830" stroke-width="20"/>
+          <line x1="200" y1="0" x2="200" y2="180" stroke="#3d3830" stroke-width="14"/>
+          <line x1="0" y1="50" x2="400" y2="130" stroke="#363028" stroke-width="10"/>
+          <!-- Road lines -->
+          <line x1="0" y1="90" x2="400" y2="90" stroke="#554e44" stroke-width="1" stroke-dasharray="16,12"/>
+          <line x1="200" y1="0" x2="200" y2="180" stroke="#554e44" stroke-width="1" stroke-dasharray="12,10"/>
+          <!-- Blocks -->
+          <rect x="20" y="20" width="60" height="40" rx="3" fill="#3a3428"/>
+          <rect x="100" y="10" width="70" height="55" rx="3" fill="#3a3428"/>
+          <rect x="240" y="20" width="55" height="50" rx="3" fill="#3a3428"/>
+          <rect x="315" y="15" width="65" height="55" rx="3" fill="#3a3428"/>
+          <rect x="20" y="110" width="75" height="50" rx="3" fill="#3a3428"/>
+          <rect x="240" y="105" width="60" height="55" rx="3" fill="#3a3428"/>
+          <rect x="320" y="110" width="60" height="50" rx="3" fill="#3a3428"/>
+          <!-- Trees -->
+          <circle cx="160" cy="50" r="8" fill="#3d5c3e"/>
+          <circle cx="175" cy="140" r="7" fill="#3d5c3e"/>
+          <circle cx="370" cy="90" r="9" fill="#3d5c3e"/>
+          <!-- Venue marker -->
+          <circle cx="200" cy="90" r="18" fill="rgba(212,137,106,0.25)" stroke="#d4896a" stroke-width="1.5"/>
+          <circle cx="200" cy="90" r="8" fill="#d4896a"/>
+          <circle cx="200" cy="90" r="3" fill="white"/>
+          <!-- Label -->
+          <rect x="215" y="74" width="90" height="22" rx="4" fill="rgba(44,36,32,0.85)"/>
+          <text x="260" y="88" fill="#e8d5b0" font-family="Georgia,serif" font-size="10" text-anchor="middle">Rosewood Estate</text>
+        </svg>
+      </div>
+      <a class="map-btn" href="https://maps.google.com" target="_blank">
+        ↗ &nbsp; Open in Maps
+      </a>
+    </div>
+  </section>
+
+  <!-- RSVP -->
+  <section class="rsvp-section reveal">
+    <p class="section-label">Kindly Reply</p>
+    <h2 class="section-title">RSVP</h2>
+    <div class="gold-ornament"><div class="orn-line"></div><div class="orn-diamond"></div><div class="orn-line"></div></div>
+    <div class="rsvp-card">
+      <p class="rsvp-note">"We would be so honoured to celebrate this joyful day in your presence."</p>
+      <span class="rsvp-deadline">Please reply by January 14, 2026</span>
+      <div class="rsvp-btns">
+        <a class="rsvp-btn rsvp-wa" href="https://wa.me/94771234567?text=Hi%21+I%27d+love+to+attend+Amara+%26+Julian%27s+wedding+%F0%9F%8C�" target="_blank">
+          💬 &nbsp; RSVP via WhatsApp
+        </a>
+        <a class="rsvp-btn rsvp-form" href="https://forms.google.com" target="_blank">
+          📋 &nbsp; Fill RSVP Form
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-names">Amara & Julian</div>
+    <p>14 · 02 · 2026</p>
+    <p style="margin-top:16px;font-size:11px;">Made with love · Rosewood Garden Estate · Sri Lanka</p>
+  </footer>
+</div>
+
+<script>
+// ── Stars ──
+const starsEl = document.getElementById('stars');
+for (let i = 0; i < 80; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2+Math.random()*4}s;animation-delay:${Math.random()*4}s`;
+  starsEl.appendChild(s);
+}
+
+// ── Open Envelope ──
+function openEnvelope() {
+  const env = document.getElementById('env');
+  const screen = document.getElementById('envelope-screen');
+  env.classList.add('opening');
+  setTimeout(() => {
+    screen.classList.add('hidden');
+    document.getElementById('main').classList.add('visible');
+    document.getElementById('musicBtn').classList.add('show');
+    initCountdown();
+    initScrollReveal();
+  }, 900);
+}
+
+// ── Countdown ──
+function initCountdown() {
+  const wedding = new Date('2026-02-14T16:00:00').getTime();
+  function tick() {
+    const now = Date.now();
+    const diff = wedding - now;
+    if (diff <= 0) {
+      document.getElementById('cd-days').textContent = '0';
+      document.getElementById('cd-hours').textContent = '0';
+      document.getElementById('cd-mins').textContent = '0';
+      document.getElementById('cd-secs').textContent = '0';
+      return;
+    }
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    document.getElementById('cd-days').textContent = d;
+    document.getElementById('cd-hours').textContent = h;
+    document.getElementById('cd-mins').textContent = m;
+    document.getElementById('cd-secs').textContent = s;
+  }
+  tick();
+  setInterval(tick, 1000);
+}
+
+// ── Scroll Reveal ──
+function initScrollReveal() {
+  const revealEls = document.querySelectorAll('.reveal');
+  const timelineItems = document.querySelectorAll('.timeline-item');
+  const allObs = [...revealEls, ...timelineItems];
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.15 });
+  allObs.forEach(el => observer.observe(el));
+}
+
+// ── Music Toggle (visual only — no autoplay without user gesture) ──
+let musicPlaying = false;
+function toggleMusic() {
+  musicPlaying = !musicPlaying;
+  const note = document.getElementById('musicNote');
+  note.classList.toggle('paused', !musicPlaying);
+  document.getElementById('musicBtn').style.background = musicPlaying ? 'var(--rose)' : 'var(--sage)';
+}
+</script>
+</body>
+</html>
